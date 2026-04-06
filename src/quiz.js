@@ -7,6 +7,8 @@ function Quiz() {
   const [score, setScore] = useState(0);
   const [time, setTime] = useState(10);
   const [showResult, setShowResult] = useState(false);
+  const [name, setName] = useState("");
+  const [leaderboard, setLeaderboard] = useState([]);
 
   useEffect(() => {
     if (time === 0) {
@@ -35,16 +37,42 @@ function Quiz() {
     if (current < questions.length - 1) {
       setCurrent(current + 1);
     } else {
-      setShowResult(true); // ✅ show result page
+      setShowResult(true);
     }
   };
 
-  // ✅ RESULT SCREEN
+  // ✅ Save score to leaderboard
+  const saveScore = () => {
+    const newEntry = { name, score };
+    const updated = [...leaderboard, newEntry]
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5); // top 5
+
+    setLeaderboard(updated);
+  };
+
+  // 🏁 RESULT SCREEN + LEADERBOARD
   if (showResult) {
     return (
       <div>
         <h2>Quiz Finished 🎉</h2>
         <h3>Your Score: {score} / {questions.length}</h3>
+
+        <input
+          type="text"
+          placeholder="Enter your name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+
+        <button onClick={saveScore}>Save Score</button>
+
+        <h3>🏆 Leaderboard</h3>
+        {leaderboard.map((item, index) => (
+          <div key={index}>
+            {index + 1}. {item.name} - {item.score}
+          </div>
+        ))}
       </div>
     );
   }
