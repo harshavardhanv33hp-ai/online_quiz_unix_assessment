@@ -8,8 +8,8 @@ app.use(express.json());
 
 // 🧠 Temporary In-memory database
 let leaderboard = [
-    { name: "Alice", score: 80 },
-    { name: "Bob", score: 70 }
+    { name: "Alice", score: 2 },
+    { name: "Bob", score: 1 }
 ];
 
 // ✅ GET leaderboard

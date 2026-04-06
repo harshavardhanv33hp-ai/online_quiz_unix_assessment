@@ -1,19 +1,21 @@
-const questions = [
+// ✅ Named export to match the import in Quiz.js
+export const questions = [
   {
-    question: "Capital of India?",
-    options: ["Mumbai", "Delhi", "Chennai", "Kolkata"],
-    answer: "Delhi"
+    questionText: 'Which command is used to list files in UNIX?',
+    answerOptions: [
+      { answerText: 'ls', isCorrect: true },
+      { answerText: 'cd', isCorrect: false },
+      { answerText: 'mkdir', isCorrect: false },
+      { answerText: 'pwd', isCorrect: false },
+    ],
   },
   {
-    question: "HTML stands for?",
-    options: [
-      "Hyper Text Markup Language",
-      "High Text Machine Language",
-      "Hyper Tool Markup Language",
-      "None"
+    questionText: 'Which command shows the current working directory?',
+    answerOptions: [
+      { answerText: 'dir', isCorrect: false },
+      { answerText: 'ls', isCorrect: false },
+      { answerText: 'pwd', isCorrect: true },
+      { answerText: 'cd', isCorrect: false },
     ],
-    answer: "Hyper Text Markup Language"
-  }
+  },
 ];
-
-export default questions;
