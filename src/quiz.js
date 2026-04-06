@@ -1,104 +1,84 @@
-import React, { useState, useEffect } from "react";
-import questions from "./data";
+import React, { useState } from 'react';
+import { questions } from './data'; // Importing your quiz data
 
-function Quiz() {
-  const [current, setCurrent] = useState(0);
-  const [selected, setSelected] = useState("");
+const Quiz = () => {
+  const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
-  const [time, setTime] = useState(10);
-  const [showResult, setShowResult] = useState(false);
-  const [name, setName] = useState("");
-  const [leaderboard, setLeaderboard] = useState([]);
+  const [showScore, setShowScore] = useState(false);
+  const [username, setUsername] = useState('');
 
-  useEffect(() => {
-    if (time === 0) {
-      handleNext();
+  const handleAnswerClick = (isCorrect) => {
+    if (isCorrect) {
+      setScore(score + 1);
+    }
+
+    const nextQuestion = currentQuestion + 1;
+    if (nextQuestion < questions.length) {
+      setCurrentQuestion(nextQuestion);
+    } else {
+      setShowScore(true);
+    }
+  };
+
+  const submitToLeaderboard = async () => {
+    if (!username.trim()) {
+      alert("Please enter a name!");
       return;
     }
 
-    const timer = setInterval(() => {
-      setTime((t) => t - 1);
-    }, 1000);
+    try {
+      const response = await fetch('http://localhost:5000/leaderboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: username, score: score }),
+      });
 
-    return () => clearInterval(timer);
-  }, [time]);
-
-  const handleNext = () => {
-    let newScore = score;
-
-    if (selected === questions[current].answer) {
-      newScore = score + 1;
-      setScore(newScore);
-    }
-
-    setSelected("");
-    setTime(10);
-
-    if (current < questions.length - 1) {
-      setCurrent(current + 1);
-    } else {
-      setShowResult(true);
+      if (response.ok) {
+        alert("Score submitted successfully!");
+        window.location.reload(); // Reset quiz
+      }
+    } catch (error) {
+      console.error("Error submitting score:", error);
     }
   };
-
-  // ✅ Save score to leaderboard
-  const saveScore = () => {
-    const newEntry = { name, score };
-    const updated = [...leaderboard, newEntry]
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 5); // top 5
-
-    setLeaderboard(updated);
-  };
-
-  // 🏁 RESULT SCREEN + LEADERBOARD
-  if (showResult) {
-    return (
-      <div>
-        <h2>Quiz Finished 🎉</h2>
-        <h3>Your Score: {score} / {questions.length}</h3>
-
-        <input
-          type="text"
-          placeholder="Enter your name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-
-        <button onClick={saveScore}>Save Score</button>
-
-        <h3>🏆 Leaderboard</h3>
-        {leaderboard.map((item, index) => (
-          <div key={index}>
-            {index + 1}. {item.name} - {item.score}
-          </div>
-        ))}
-      </div>
-    );
-  }
 
   return (
-    <div>
-      <h2>Time Left: {time}s</h2>
-
-      <h3>{questions[current].question}</h3>
-
-      {questions[current].options.map((opt, index) => (
-        <div key={index}>
-          <input
-            type="radio"
-            name="option"
-            value={opt}
-            checked={selected === opt}
-            onChange={() => setSelected(opt)}
+    <div className="quiz-container">
+      {showScore ? (
+        <div className="score-section">
+          <h2>You scored {score} out of {questions.length}</h2>
+          <input 
+            type="text" 
+            placeholder="Enter your name" 
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
-          {opt}
+          <button onClick={submitToLeaderboard}>Submit to Leaderboard</button>
         </div>
-      ))}
-
-      <button onClick={handleNext}>Next</button>
+      ) : (
+        <>
+          <div className="question-section">
+            <div className="question-count">
+              <span>Question {currentQuestion + 1}</span>/{questions.length}
+            </div>
+            <div className="question-text">
+              {questions[currentQuestion].questionText}
+            </div>
+          </div>
+          <div className="answer-section">
+            {questions[currentQuestion].answerOptions.map((option, index) => (
+              <button 
+                key={index} 
+                onClick={() => handleAnswerClick(option.isCorrect)}
+              >
+                {option.answerText}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
-}
+};
 
 export default Quiz;
