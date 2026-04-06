@@ -5,9 +5,9 @@ function Quiz() {
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState("");
   const [score, setScore] = useState(0);
-  const [time, setTime] = useState(10); // ⏱️ 10 sec per question
+  const [time, setTime] = useState(10);
+  const [showResult, setShowResult] = useState(false);
 
-  // ⏳ Timer logic
   useEffect(() => {
     if (time === 0) {
       handleNext();
@@ -30,14 +30,24 @@ function Quiz() {
     }
 
     setSelected("");
-    setTime(10); // reset timer
+    setTime(10);
 
     if (current < questions.length - 1) {
       setCurrent(current + 1);
     } else {
-      alert("Quiz Finished! Your Score: " + newScore);
+      setShowResult(true); // ✅ show result page
     }
   };
+
+  // ✅ RESULT SCREEN
+  if (showResult) {
+    return (
+      <div>
+        <h2>Quiz Finished 🎉</h2>
+        <h3>Your Score: {score} / {questions.length}</h3>
+      </div>
+    );
+  }
 
   return (
     <div>
